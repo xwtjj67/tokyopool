@@ -20,6 +20,10 @@ const Display = () => {
   }, []);
 
   useEffect(() => {
+    if (scoreChanged) playScoreSound(scoreChanged);
+  }, [scoreChanged]);
+
+  useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "f" || e.key === "F") toggleFullscreen();
     };
