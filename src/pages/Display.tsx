@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import tokyoLogo from "@/assets/tokyo-pool-logo.jpg";
 import hexmenLogo from "@/assets/hexmen-logo.jpg";
 import { User, Maximize } from "lucide-react";
+import { playScoreSound } from "@/lib/sounds";
 
 const Display = () => {
   const { match, loading, scoreChanged } = useMatch();
@@ -17,6 +18,10 @@ const Display = () => {
       setIsFullscreen(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (scoreChanged) playScoreSound(scoreChanged);
+  }, [scoreChanged]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
