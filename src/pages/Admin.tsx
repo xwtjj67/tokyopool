@@ -16,6 +16,10 @@ import {
 import PlayerCard from "@/components/admin/PlayerCard";
 
 const Admin = () => {
+  const [authenticated, setAuthenticated] = useState(
+    () => sessionStorage.getItem("admin_auth") === "true"
+  );
+
   const {
     match,
     loading,
