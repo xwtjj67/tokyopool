@@ -1,4 +1,5 @@
 import { User } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface PlayerPanelProps {
   name: string;
@@ -13,68 +14,80 @@ const PlayerPanel = ({ name, score, image, player, isScoreChanged, isWinner }: P
   const isP1 = player === "p1";
 
   return (
-    <div className={`relative flex flex-1 flex-col items-center justify-center gap-3 lg:gap-5 overflow-hidden rounded-3xl ${isWinner ? "winner-glow" : ""}`}>
-      {/* Large background player image */}
-      <div className="absolute inset-0 overflow-hidden rounded-3xl">
-        {image ? (
-          <>
-            {/* Blurred background fill */}
-            <img
-              src={image}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-60"
-            />
-            {/* Sharp contained image */}
+    <motion.div
+      initial={{ opacity: 0, x: isP1 ? -60 : 60 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut", delay: isP1 ? 0.1 : 0.2 }}
+      className={`relative flex flex-1 items-center gap-4 lg:gap-8 ${isP1 ? "flex-row" : "flex-row-reverse"}`}
+    >
+      {/* Player image - circular frame with neon border */}
+      <div className="relative flex-shrink-0">
+        <div
+          className={`relative h-20 w-20 lg:h-32 lg:w-32 xl:h-36 xl:w-36 rounded-full overflow-hidden border-[3px] ${
+            isP1 ? "border-player1" : "border-player2"
+          } ${isWinner ? (isP1 ? "glow-player1" : "glow-player2") : ""}`}
+          style={{
+            boxShadow: isWinner
+              ? undefined
+              : `0 0 20px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.3), inset 0 0 15px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.1)`,
+          }}
+        >
+          {image ? (
             <img
               src={image}
               alt={name}
-              className="relative h-full w-full object-contain z-[1]"
+              className="h-full w-full object-cover"
             />
-            {/* Dark gradient overlay for readability */}
-            <div className="absolute inset-0 z-[2] bg-gradient-to-t from-background via-background/70 to-background/40" />
-          </>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted/30">
-            <User className={`h-32 w-32 lg:h-48 lg:w-48 ${isP1 ? "text-player1" : "text-player2"} opacity-10`} />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-muted/50">
+              <User className={`h-10 w-10 lg:h-16 lg:w-16 ${isP1 ? "text-player1" : "text-player2"} opacity-40`} />
+            </div>
+          )}
+        </div>
 
-      {/* Player info overlay at bottom */}
-      <div className="relative z-10 flex flex-col items-center gap-2 lg:gap-4 mt-auto pb-4 lg:pb-6 pt-16 lg:pt-24 w-full">
-        {/* Colored accent bar */}
+        {/* Ring glow effect */}
         <div
-          className={`h-1 w-16 lg:w-24 rounded-full ${isP1 ? "bg-player1" : "bg-player2"}`}
+          className="absolute inset-0 rounded-full pulse-soft pointer-events-none"
           style={{
-            boxShadow: `0 0 20px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.6)`,
+            boxShadow: `0 0 30px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.15)`,
           }}
         />
+      </div>
 
+      {/* Player name and score */}
+      <div className={`flex flex-1 items-center gap-4 lg:gap-6 ${isP1 ? "flex-row" : "flex-row-reverse"}`}>
         {/* Name */}
-        <h2
-          className={`font-display text-xl font-bold uppercase tracking-[0.15em] lg:text-3xl ${isP1 ? "text-player1" : "text-player2"}`}
-          style={{
-            textShadow: `0 0 30px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.5)`,
-          }}
-        >
-          {name}
-        </h2>
+        <div className={`flex flex-col ${isP1 ? "items-start" : "items-end"}`}>
+          {/* Accent bar */}
+          <div
+            className={`h-[2px] w-10 lg:w-16 rounded-full mb-2 neon-line-glow ${isP1 ? "bg-player1" : "bg-player2"}`}
+          />
+          <h2
+            className={`font-display text-sm lg:text-xl xl:text-2xl font-bold uppercase tracking-[0.15em] ${isP1 ? "text-player1" : "text-player2"}`}
+            style={{
+              textShadow: `0 0 25px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.6)`,
+            }}
+          >
+            {name}
+          </h2>
+        </div>
 
         {/* Score */}
-        <div
+        <motion.div
           key={`${player}-${score}`}
-          className={`font-display text-[16vh] font-bold leading-none text-foreground lg:text-[22vh] ${
-            isScoreChanged ? "score-pop" : ""
-          }`}
+          initial={isScoreChanged ? { scale: 1.4, opacity: 0.7 } : false}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          className={`font-score text-7xl lg:text-[12vh] xl:text-[14vh] font-black leading-none ${isP1 ? "ml-auto" : "mr-auto"}`}
           style={{
-            textShadow: `0 0 80px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.5), 0 2px 4px rgba(0,0,0,0.5)`,
+            color: "hsl(var(--foreground))",
+            textShadow: `0 0 60px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.5), 0 0 120px hsl(var(--${isP1 ? "player1" : "player2"}) / 0.2), 0 2px 4px rgba(0,0,0,0.8)`,
           }}
         >
           {score}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
