@@ -1,0 +1,9 @@
+{
+  "appId": "app.lovable.13a019786c9149ae8f2c8dc90163372a",
+  "appName": "tokyopool",
+  "webDir": "dist",
+  "server": {
+    "url": "https://13a01978-6c91-49ae-8f2c-8dc90163372a.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  }
+}

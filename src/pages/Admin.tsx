@@ -1,7 +1,8 @@
 import { useMatch } from "@/hooks/useMatch";
 import { useMatchTimer } from "@/hooks/useMatchTimer";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import AdminLogin from "@/components/admin/AdminLogin";
 import {
   Plus,
   Minus,
@@ -15,6 +16,10 @@ import {
 import PlayerCard from "@/components/admin/PlayerCard";
 
 const Admin = () => {
+  const [authenticated, setAuthenticated] = useState(
+    () => sessionStorage.getItem("admin_auth") === "true"
+  );
+
   const {
     match,
     loading,
@@ -49,6 +54,10 @@ const Admin = () => {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [match, updateMatch, resetMatch]);
+
+  if (!authenticated) {
+    return <AdminLogin onLogin={() => setAuthenticated(true)} />;
+  }
 
   if (loading) {
     return (
