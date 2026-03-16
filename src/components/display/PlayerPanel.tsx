@@ -18,13 +18,20 @@ const PlayerPanel = ({ name, score, image, player, isScoreChanged, isWinner }: P
       <div className="absolute inset-0 overflow-hidden rounded-3xl">
         {image ? (
           <>
+            {/* Blurred background fill */}
+            <img
+              src={image}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-60"
+            />
+            {/* Sharp contained image */}
             <img
               src={image}
               alt={name}
-              className="h-full w-full object-contain"
+              className="relative h-full w-full object-contain z-[1]"
             />
             {/* Dark gradient overlay for readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40" />
+            <div className="absolute inset-0 z-[2] bg-gradient-to-t from-background via-background/70 to-background/40" />
           </>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-muted/30">
