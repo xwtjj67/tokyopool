@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Kanit", "sans-serif"],
+        display: ["Oswald", "sans-serif"],
         body: ["Inter", "sans-serif"],
       },
       colors: {
@@ -53,7 +53,8 @@ export default {
         },
         player1: "hsl(var(--player1))",
         player2: "hsl(var(--player2))",
-        gold: "hsl(var(--gold))",
+        billiard: "hsl(var(--billiard))",
+        felt: "hsl(var(--felt))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

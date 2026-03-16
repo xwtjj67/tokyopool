@@ -5,34 +5,38 @@ import { Button } from "@/components/ui/button";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background p-6">
+    <div className="felt-bg flex min-h-screen flex-col items-center justify-center gap-10 p-6">
       <img
         src={tokyoLogo}
         alt="Tokyo Pool"
-        className="h-32 w-32 rounded-full object-cover"
+        className="h-36 w-36 rounded-full object-cover shadow-2xl"
+        style={{ boxShadow: "0 0 60px hsl(145 80% 42% / 0.3)" }}
       />
-      <h1 className="text-center font-display text-4xl font-extrabold tracking-wider text-gold glow-gold">
-        TOKYO POOL
-      </h1>
-      <p className="text-center font-display text-lg text-muted-foreground">
-        Live Scoreboard System
-      </p>
+      <div className="flex flex-col items-center gap-2">
+        <h1 className="text-center font-display text-5xl font-bold uppercase tracking-[0.2em] text-billiard glow-billiard">
+          TOKYO POOL
+        </h1>
+        <p className="text-center font-body text-lg text-muted-foreground">
+          Live Scoreboard System
+        </p>
+      </div>
 
       <div className="flex flex-col gap-4 sm:flex-row">
         <Link to="/display">
           <Button
             size="lg"
-            className="h-16 w-52 bg-primary font-display text-lg font-bold text-primary-foreground hover:bg-primary/90"
+            variant="outline"
+            className="h-16 w-56 rounded-xl glass font-display text-lg font-bold transition-transform hover:scale-105"
           >
-            <Monitor className="mr-2 h-5 w-5" /> TV Display
+            <Monitor className="mr-3 h-5 w-5" /> TV Display
           </Button>
         </Link>
         <Link to="/admin">
           <Button
             size="lg"
-            className="h-16 w-52 bg-gold font-display text-lg font-bold text-background hover:bg-gold/90"
+            className="h-16 w-56 rounded-xl bg-primary font-display text-lg font-bold text-primary-foreground hover:bg-primary/90 transition-transform hover:scale-105"
           >
-            <Smartphone className="mr-2 h-5 w-5" /> Control Panel
+            <Smartphone className="mr-3 h-5 w-5" /> Control Panel
           </Button>
         </Link>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface Match {
@@ -11,12 +11,21 @@ export interface Match {
   player2_image: string | null;
   race_to: number;
   is_active: boolean;
+  created_at: string;
 }
 
 export function useMatch() {
   const [match, setMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
   const [scoreChanged, setScoreChanged] = useState<"p1" | "p2" | null>(null);
+  const [winner, setWinner] = useState<"p1" | "p2" | null>(null);
+  const prevMatchRef = useRef<Match | null>(null);
+
+  const checkWinner = useCallback((m: Match): "p1" | "p2" | null => {
+    if (m.player1_score >= m.race_to) return "p1";
+    if (m.player2_score >= m.race_to) return "p2";
+    return null;
+  }, []);
 
   const fetchMatch = useCallback(async () => {
     const { data, error } = await supabase
@@ -35,9 +44,18 @@ export function useMatch() {
         }
         return data;
       });
+
+      const w = checkWinner(data);
+      const prevW = prevMatchRef.current ? checkWinner(prevMatchRef.current) : null;
+      if (w && !prevW) setWinner(w);
+      else if (!w) setWinner(null);
+      prevMatchRef.current = data;
+    } else {
+      setMatch(null);
+      setWinner(null);
     }
     setLoading(false);
-  }, []);
+  }, [checkWinner]);
 
   useEffect(() => {
     fetchMatch();
@@ -94,30 +112,36 @@ export function useMatch() {
       .eq("id", match.id);
   }, [match]);
 
-  const newMatch = useCallback(async () => {
+  const newMatch = useCallback(async (keepPlayers = false) => {
     if (match) {
       await supabase.from("matches").update({ is_active: false }).eq("id", match.id);
     }
     await supabase.from("matches").insert({
-      player1_name: "Player 1",
-      player2_name: "Player 2",
+      player1_name: keepPlayers && match ? match.player1_name : "Player 1",
+      player2_name: keepPlayers && match ? match.player2_name : "Player 2",
       player1_score: 0,
       player2_score: 0,
+      player1_image: keepPlayers && match ? match.player1_image : null,
+      player2_image: keepPlayers && match ? match.player2_image : null,
       race_to: match?.race_to ?? 5,
     });
   }, [match]);
+
+  const rematch = useCallback(async () => {
+    await newMatch(true);
+  }, [newMatch]);
 
   const uploadPlayerImage = useCallback(
     async (player: 1 | 2, file: File) => {
       if (!match) return;
       const ext = file.name.split(".").pop();
       const path = `${match.id}/player${player}.${ext}`;
-      
+
       await supabase.storage.from("player-images").upload(path, file, { upsert: true });
-      
+
       const { data } = supabase.storage.from("player-images").getPublicUrl(path);
       const url = data.publicUrl + "?t=" + Date.now();
-      
+
       await supabase
         .from("matches")
         .update(player === 1 ? { player1_image: url } : { player2_image: url })
@@ -130,10 +154,12 @@ export function useMatch() {
     match,
     loading,
     scoreChanged,
+    winner,
     updateMatch,
     resetMatch,
     swapPlayers,
     newMatch,
+    rematch,
     uploadPlayerImage,
   };
 }
