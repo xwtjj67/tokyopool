@@ -55,6 +55,10 @@ const Admin = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [match, updateMatch, resetMatch]);
 
+  if (!authenticated) {
+    return <AdminLogin onLogin={() => setAuthenticated(true)} />;
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
