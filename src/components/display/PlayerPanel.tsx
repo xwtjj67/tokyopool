@@ -21,7 +21,7 @@ const PlayerPanel = ({ name, score, image, player, isScoreChanged, isWinner }: P
             <img
               src={image}
               alt={name}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
             {/* Dark gradient overlay for readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/40" />
