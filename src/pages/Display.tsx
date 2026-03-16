@@ -47,7 +47,7 @@ const Display = () => {
   }
 
   return (
-    <div className="felt-bg tv-hide-scrollbar tv-hide-cursor relative flex h-screen w-screen flex-col items-center justify-between overflow-hidden p-6 lg:p-10">
+    <div className="felt-bg tv-hide-scrollbar tv-hide-cursor relative flex h-screen w-screen flex-col overflow-hidden">
       {/* Winner overlay */}
       {winner && (
         <WinnerOverlay
@@ -67,18 +67,18 @@ const Display = () => {
       )}
 
       {/* Top bar */}
-      <div className="z-10 flex w-full max-w-7xl items-center justify-between">
+      <div className="z-10 flex w-full items-center justify-between px-6 pt-4 lg:px-10 lg:pt-6">
         <img
           src={tokyoLogo}
           alt="Tokyo Pool"
-          className="h-14 w-14 rounded-full object-cover lg:h-20 lg:w-20"
+          className="h-12 w-12 rounded-full object-cover lg:h-16 lg:w-16"
         />
         <div className="flex flex-col items-center">
-          <h1 className="font-display text-2xl font-bold uppercase tracking-[0.2em] text-billiard glow-billiard lg:text-4xl">
+          <h1 className="font-display text-xl font-bold uppercase tracking-[0.2em] text-billiard glow-billiard lg:text-3xl">
             TOKYO POOL
           </h1>
-          <div className="glass mt-1 rounded-full px-4 py-1">
-            <p className="font-display text-sm tracking-wider text-muted-foreground lg:text-base">
+          <div className="glass mt-1 rounded-full px-4 py-0.5">
+            <p className="font-display text-xs tracking-wider text-muted-foreground lg:text-sm">
               RACE TO {match.race_to}
             </p>
           </div>
@@ -86,12 +86,12 @@ const Display = () => {
         <img
           src={hexmenLogo}
           alt="HEX MEN"
-          className="h-10 w-auto object-contain lg:h-16"
+          className="h-8 w-auto object-contain lg:h-12"
         />
       </div>
 
-      {/* Main scoreboard */}
-      <div className="z-10 flex w-full max-w-7xl flex-1 items-center justify-center gap-4 lg:gap-8">
+      {/* Main scoreboard - takes remaining space */}
+      <div className="z-10 flex flex-1 items-stretch gap-3 px-6 py-4 lg:gap-6 lg:px-10 lg:py-6">
         <PlayerPanel
           name={match.player1_name}
           score={match.player1_score}
@@ -102,12 +102,12 @@ const Display = () => {
         />
 
         {/* VS Divider */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-20 w-px bg-gradient-to-b from-transparent via-border to-transparent lg:h-32" />
-          <span className="font-display text-4xl font-bold text-muted-foreground lg:text-6xl">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <div className="h-16 w-px bg-gradient-to-b from-transparent via-border to-transparent lg:h-24" />
+          <span className="font-display text-2xl font-bold text-muted-foreground/60 lg:text-4xl">
             VS
           </span>
-          <div className="h-20 w-px bg-gradient-to-b from-transparent via-border to-transparent lg:h-32" />
+          <div className="h-16 w-px bg-gradient-to-b from-transparent via-border to-transparent lg:h-24" />
         </div>
 
         <PlayerPanel
@@ -121,8 +121,8 @@ const Display = () => {
       </div>
 
       {/* Bottom bar */}
-      <div className="z-10 flex w-full max-w-7xl items-center justify-center">
-        <p className="font-body text-xs text-muted-foreground/50">
+      <div className="z-10 flex w-full items-center justify-center pb-3">
+        <p className="font-body text-[10px] text-muted-foreground/30">
           Press F for fullscreen
         </p>
       </div>
