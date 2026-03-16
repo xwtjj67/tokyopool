@@ -1,27 +1,36 @@
 import { useMatch } from "@/hooks/useMatch";
+import { useMatchTimer } from "@/hooks/useMatchTimer";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Plus,
   Minus,
   RotateCcw,
   ArrowLeftRight,
   Sparkles,
-  Upload,
-  User,
+  RefreshCw,
+  Timer,
+  Trophy,
 } from "lucide-react";
+import PlayerCard from "@/components/admin/PlayerCard";
 
 const Admin = () => {
   const {
     match,
     loading,
+    winner,
     updateMatch,
     resetMatch,
     swapPlayers,
     newMatch,
+    rematch,
     uploadPlayerImage,
   } = useMatch();
+
+  const { formatted: timerFormatted } = useMatchTimer(
+    match?.created_at ?? null,
+    match?.is_active ?? false
+  );
 
   const p1FileRef = useRef<HTMLInputElement>(null);
   const p2FileRef = useRef<HTMLInputElement>(null);
@@ -44,16 +53,21 @@ const Admin = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="font-display text-xl text-gold">Loading...</p>
+        <div className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
       </div>
     );
   }
 
   if (!match) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-4">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background p-4">
+        <div className="text-6xl">🎱</div>
         <p className="font-display text-xl text-muted-foreground">No active match</p>
-        <Button onClick={newMatch} size="lg" className="bg-gold font-display text-lg font-bold text-background hover:bg-gold/90">
+        <Button
+          onClick={() => newMatch()}
+          size="lg"
+          className="h-14 bg-primary font-display text-lg font-bold text-primary-foreground hover:bg-primary/90"
+        >
           <Sparkles className="mr-2 h-5 w-5" /> Start New Match
         </Button>
       </div>
@@ -67,23 +81,39 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 pb-8">
-      <h1 className="mb-6 text-center font-display text-2xl font-bold text-gold">
-        TOKYO POOL • CONTROL
-      </h1>
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="font-display text-xl font-bold uppercase tracking-wider text-billiard">
+          TOKYO POOL
+        </h1>
+        <div className="glass flex items-center gap-2 rounded-full px-3 py-1.5">
+          <Timer className="h-4 w-4 text-muted-foreground" />
+          <span className="font-display text-sm text-foreground">{timerFormatted}</span>
+        </div>
+      </div>
+
+      {/* Winner banner */}
+      {winner && (
+        <div className="glass-strong mb-4 flex items-center justify-center gap-3 rounded-xl p-4">
+          <Trophy className={`h-6 w-6 ${winner === "p1" ? "text-player1" : "text-player2"}`} />
+          <span className="font-display text-lg font-bold text-foreground">
+            {winner === "p1" ? match.player1_name : match.player2_name} WINS!
+          </span>
+          <Trophy className={`h-6 w-6 ${winner === "p1" ? "text-player1" : "text-player2"}`} />
+        </div>
+      )}
 
       <div className="mx-auto flex max-w-md flex-col gap-4">
-        {/* Player 1 Card */}
+        {/* Player cards */}
         <PlayerCard
-          label="PLAYER 1"
+          label="Player 1"
           name={match.player1_name}
           score={match.player1_score}
           image={match.player1_image}
-          colorClass="border-player1 text-player1"
+          playerColor="player1"
           onNameChange={(name) => updateMatch({ player1_name: name })}
           onScoreUp={() => updateMatch({ player1_score: match.player1_score + 1 })}
-          onScoreDown={() =>
-            updateMatch({ player1_score: Math.max(0, match.player1_score - 1) })
-          }
+          onScoreDown={() => updateMatch({ player1_score: Math.max(0, match.player1_score - 1) })}
           onImageClick={() => p1FileRef.current?.click()}
         />
         <input
@@ -94,18 +124,15 @@ const Admin = () => {
           onChange={(e) => handleFileUpload(1, e)}
         />
 
-        {/* Player 2 Card */}
         <PlayerCard
-          label="PLAYER 2"
+          label="Player 2"
           name={match.player2_name}
           score={match.player2_score}
           image={match.player2_image}
-          colorClass="border-player2 text-player2"
+          playerColor="player2"
           onNameChange={(name) => updateMatch({ player2_name: name })}
           onScoreUp={() => updateMatch({ player2_score: match.player2_score + 1 })}
-          onScoreDown={() =>
-            updateMatch({ player2_score: Math.max(0, match.player2_score - 1) })
-          }
+          onScoreDown={() => updateMatch({ player2_score: Math.max(0, match.player2_score - 1) })}
           onImageClick={() => p2FileRef.current?.click()}
         />
         <input
@@ -117,26 +144,26 @@ const Admin = () => {
         />
 
         {/* Race To */}
-        <div className="rounded-lg border border-border bg-card p-4">
-          <label className="mb-2 block font-display text-sm font-semibold text-muted-foreground">
-            RACE TO
+        <div className="glass-strong rounded-xl p-4">
+          <label className="mb-2 block font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Race To
           </label>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="icon"
-              className="h-12 w-12"
+              className="h-12 w-12 rounded-xl"
               onClick={() => updateMatch({ race_to: Math.max(1, match.race_to - 1) })}
             >
               <Minus className="h-5 w-5" />
             </Button>
-            <span className="min-w-[3rem] text-center font-display text-3xl font-bold text-gold">
+            <span className="min-w-[3rem] text-center font-display text-3xl font-bold text-primary">
               {match.race_to}
             </span>
             <Button
               variant="outline"
               size="icon"
-              className="h-12 w-12"
+              className="h-12 w-12 rounded-xl"
               onClick={() => updateMatch({ race_to: match.race_to + 1 })}
             >
               <Plus className="h-5 w-5" />
@@ -144,117 +171,46 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Global Controls */}
+        {/* Actions */}
         <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={resetMatch}
+              variant="outline"
+              className="h-14 rounded-xl font-display text-sm font-semibold transition-transform active:scale-95"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset
+            </Button>
+            <Button
+              onClick={swapPlayers}
+              variant="outline"
+              className="h-14 rounded-xl font-display text-sm font-semibold transition-transform active:scale-95"
+            >
+              <ArrowLeftRight className="mr-2 h-4 w-4" /> Swap
+            </Button>
+          </div>
+
+          {winner && (
+            <Button
+              onClick={rematch}
+              className="h-14 rounded-xl bg-secondary font-display text-base font-bold text-secondary-foreground hover:bg-secondary/90 transition-transform active:scale-95"
+            >
+              <RefreshCw className="mr-2 h-5 w-5" /> Quick Rematch
+            </Button>
+          )}
+
           <Button
-            onClick={resetMatch}
-            variant="outline"
-            size="lg"
-            className="h-14 font-display text-base font-semibold"
-          >
-            <RotateCcw className="mr-2 h-5 w-5" /> Reset Scores
-          </Button>
-          <Button
-            onClick={swapPlayers}
-            variant="outline"
-            size="lg"
-            className="h-14 font-display text-base font-semibold"
-          >
-            <ArrowLeftRight className="mr-2 h-5 w-5" /> Swap Players
-          </Button>
-          <Button
-            onClick={newMatch}
-            size="lg"
-            className="h-14 bg-gold font-display text-base font-bold text-background hover:bg-gold/90"
+            onClick={() => newMatch()}
+            className="h-14 rounded-xl bg-primary font-display text-base font-bold text-primary-foreground hover:bg-primary/90 transition-transform active:scale-95"
           >
             <Sparkles className="mr-2 h-5 w-5" /> New Match
           </Button>
         </div>
 
-        {/* Keyboard shortcuts hint */}
+        {/* Shortcuts hint */}
         <p className="mt-2 text-center font-body text-xs text-muted-foreground">
           Shortcuts: 1/2 = +score • Q/W = -score • R = reset
         </p>
-      </div>
-    </div>
-  );
-};
-
-interface PlayerCardProps {
-  label: string;
-  name: string;
-  score: number;
-  image: string | null;
-  colorClass: string;
-  onNameChange: (name: string) => void;
-  onScoreUp: () => void;
-  onScoreDown: () => void;
-  onImageClick: () => void;
-}
-
-const PlayerCard = ({
-  label,
-  name,
-  score,
-  image,
-  colorClass,
-  onNameChange,
-  onScoreUp,
-  onScoreDown,
-  onImageClick,
-}: PlayerCardProps) => {
-  return (
-    <div className={`rounded-xl border-2 bg-card p-4 ${colorClass.split(" ")[0]}`}>
-      <div className="mb-3 flex items-center gap-3">
-        {/* Player image */}
-        <button
-          onClick={onImageClick}
-          className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full border-2 ${colorClass.split(" ")[0]}`}
-        >
-          {image ? (
-            <img src={image} alt={name} className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <User className={`h-7 w-7 ${colorClass.split(" ")[1]}`} />
-            </div>
-          )}
-          <div className="absolute inset-0 flex items-center justify-center bg-background/50 opacity-0 transition-opacity hover:opacity-100">
-            <Upload className="h-5 w-5 text-foreground" />
-          </div>
-        </button>
-
-        <div className="flex-1">
-          <p className={`font-display text-xs font-semibold ${colorClass.split(" ")[1]}`}>
-            {label}
-          </p>
-          <Input
-            value={name}
-            onChange={(e) => onNameChange(e.target.value)}
-            className="mt-1 h-10 border-border bg-muted font-display text-base font-semibold text-foreground"
-          />
-        </div>
-      </div>
-
-      {/* Score controls */}
-      <div className="flex items-center justify-between gap-3">
-        <Button
-          variant="outline"
-          onClick={onScoreDown}
-          className="h-16 w-16 text-xl font-bold"
-        >
-          <Minus className="h-6 w-6" />
-        </Button>
-
-        <span className="min-w-[4rem] text-center font-display text-5xl font-black text-gold">
-          {score}
-        </span>
-
-        <Button
-          onClick={onScoreUp}
-          className="h-20 w-20 bg-primary text-2xl font-bold text-primary-foreground hover:bg-primary/90"
-        >
-          <Plus className="h-8 w-8" />
-        </Button>
       </div>
     </div>
   );
